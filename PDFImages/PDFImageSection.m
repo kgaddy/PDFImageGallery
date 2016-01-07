@@ -100,18 +100,58 @@
 }
 
 - (void)prepareLayout {
-    self.idealHeight = self.sectionHeight / 2;
+    self.idealHeight = self.sectionHeight / 1.1;
     self.resizedImages = [[NSMutableArray alloc] init];
     self.imageWidths = [[NSMutableArray alloc] init];
     self.numberOfRows = [self perfectRowNumber];
+
+    if (self.numberOfRows * self.idealHeight > self.sectionHeight) {
+        //    self.idealHeight = self.sectionHeight / self.numberOfRows;
+    }
+
     for (UIImage *image in self.images) {
         UIImage *img = [self scaledToHeight:self.idealHeight image:image];
         [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
         [self.resizedImages addObject:img];
     }
+ 
     // NSArray *array = [self linearPartition];
-    NSArray *array = [self greedySolution];
+    [self greedySolution];
 
+    self.imageAttributes = [[NSMutableArray alloc] init];
+    int rowNumber = 0;
+    CGFloat rowWidth = self.startX;
+    CGFloat height = self.idealHeight;
+    CGFloat startY = 0.0;
+    for (NSMutableArray *array in self.resizedImages) {
+        NSMutableArray *workingArray = array;
+        //check width
+        CGFloat width = [self getSumOfWidthsFromArray:workingArray];
+        // if (width > self.sectionWidth) {
+        NSMutableArray *resizedArray = [[NSMutableArray alloc] init];
+        float precentage = (100 * self.sectionWidth) / width;
+        for (UIImage *img in workingArray) {
+            UIImage *newImage = [self resizedImageWithPercent:precentage - 0.5 image:img];
+            [resizedArray addObject:newImage];
+        }
+        workingArray = resizedArray;
+        // }
+
+        for (UIImage *img in workingArray) {
+            ImageAttribute *ia = [[ImageAttribute alloc] init];
+            ia.image = img;
+
+            CGRect frame = CGRectMake(rowWidth, startY, img.size.width, img.size.height);
+            height = img.size.height;
+            ia.frame = frame;
+            [self.imageAttributes addObject:ia];
+            rowWidth = rowWidth + img.size.width;
+        }
+        startY = startY + height;
+        rowWidth = self.startX;
+
+        rowNumber++;
+    }
 }
 
 - (UIImage *)scaledToWidth:(float)scaledToWidth image:(UIImage *)image {
@@ -450,7 +490,7 @@
         }
         [groupsByImage addObject:images];
     }
-    
+
     self.resizedImages = groupsByImage;
 
     return [results copy];
@@ -472,6 +512,17 @@
     }
 
     return index;
+}
+
+- (CGFloat)getSumOfWidthsFromArray:(NSArray *)array {
+    CGFloat width = 0.0;
+
+    for (int i = 0; i < array.count; i++) {
+        UIImage *img = [array objectAtIndex:i];
+        width = width + img.size.width;
+    }
+
+    return width;
 }
 
 @end
