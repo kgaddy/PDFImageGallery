@@ -71,7 +71,7 @@
     CGRect boundingRect = CGRectMake(10, textRect.origin.y + textRect.size.height + 20, kPageWidth - 20, 400);
     [self addLineWithFrame:boundingRect withColor:[UIColor redColor]];
 
-    PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x numberOfColumns:2 sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height];
+    PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height];
 
     for (ImageAttribute *ia in pdfSection.imageAttributes) {
         [self addImage:ia.image atPoint:CGPointMake(ia.frame.origin.x, ia.frame.origin.y)];

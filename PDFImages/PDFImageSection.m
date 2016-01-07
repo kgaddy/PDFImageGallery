@@ -27,13 +27,12 @@
 #define kHeightModule 40
 @implementation PDFImageSection
 
-- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX numberOfColumns:(int)numberOfColumns sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight {
+- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight {
     self = [super init];
     if (self) {
         _startY = startY;
         _startX = startX;
         _images = images;
-        _numberOfColumns = numberOfColumns;
         _sectionWidth = sectionWidth;
         _sectionHeight = sectionHeight;
         [self prepareLayout];
@@ -62,7 +61,6 @@
     CGFloat longestValue = 0;
 
     NSUInteger i = 0;
-    //  for (NSNumber *heightValue in self.columns) {
     for (PDFColumnAttributes *col in self.columnsAttributes) {
         float heightValue = col.columnHeight;
         if (heightValue > longestValue) {
@@ -71,12 +69,6 @@
         }
         i++;
     }
-    return retVal;
-}
-
-- (float)columnWidth {
-    float retVal = self.sectionWidth / self.numberOfColumns;
-    retVal = roundf(retVal);
     return retVal;
 }
 
@@ -99,25 +91,28 @@
     return retVal;
 }
 
-- (void)prepareLayout {
+- (void)setInitialValues {
     self.idealHeight = self.sectionHeight / 1.1;
     self.resizedImages = [[NSMutableArray alloc] init];
     self.imageWidths = [[NSMutableArray alloc] init];
     self.numberOfRows = [self perfectRowNumber];
+}
 
+- (void)resizeIdealHeightToFitSectionHeight {
     if (self.numberOfRows * self.idealHeight > self.sectionHeight) {
-        //    self.idealHeight = self.sectionHeight / self.numberOfRows;
+        self.idealHeight = self.sectionHeight / self.numberOfRows;
     }
+}
 
+- (void)resizeImagesToIdealHeight {
     for (UIImage *image in self.images) {
         UIImage *img = [self scaledToHeight:self.idealHeight image:image];
         [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
         [self.resizedImages addObject:img];
     }
- 
-    // NSArray *array = [self linearPartition];
-    [self greedySolution];
+}
 
+- (void)setImageAttributes {
     self.imageAttributes = [[NSMutableArray alloc] init];
     int rowNumber = 0;
     CGFloat rowWidth = self.startX;
@@ -152,6 +147,15 @@
 
         rowNumber++;
     }
+}
+
+- (void)prepareLayout {
+    [self setInitialValues];
+    [self resizeIdealHeightToFitSectionHeight];
+    [self resizeImagesToIdealHeight];
+
+    // NSArray *array = [self linearPartition];
+    [self implementGreedySolution];
 }
 
 - (UIImage *)scaledToWidth:(float)scaledToWidth image:(UIImage *)image {
@@ -451,7 +455,7 @@
 }
 
 /*greedy solution*/
-- (NSArray *)greedySolution {
+- (NSArray *)implementGreedySolution {
     int k = (int)self.numberOfRows;
     NSMutableArray *results = [[NSMutableArray alloc] init];
     NSMutableArray *resultsTotal = [[NSMutableArray alloc] init];
