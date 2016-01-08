@@ -24,14 +24,4 @@
     [super tearDown];
 }
 
-- (void)testPixelsToTrimOffEachImageWithTotalImageHeight_OverAreaHeight {
-    float val = [self.sut pixelsToTrimOffEachImageWithTotalImageHeight:844 numberOfImages:4 areaHeight:640];
-    XCTAssertTrue(val == 51);
-}
-
-- (void)testPixelsToTrimOffEachImageWithTotalImageHeight_UnderAreaHeight {
-    float val = [self.sut pixelsToTrimOffEachImageWithTotalImageHeight:610 numberOfImages:4 areaHeight:640];
-    XCTAssertTrue(val == 0);
-}
-
 @end

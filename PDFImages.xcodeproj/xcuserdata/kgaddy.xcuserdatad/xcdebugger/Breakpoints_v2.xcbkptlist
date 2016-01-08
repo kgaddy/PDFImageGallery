@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PDFImages/PDFImageSection.m"
-            timestampString = "473910524.469736"
+            timestampString = "473911103.764689"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "554"
-            endingLineNumber = "554"
+            startingLineNumber = "277"
+            endingLineNumber = "277"
             landmarkName = "@implementation PDFImageSection"
             landmarkType = "3">
          </BreakpointContent>
