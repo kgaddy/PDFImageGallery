@@ -27,7 +27,7 @@
 #define kHeightModule 40
 @implementation PDFImageSection
 
-- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight {
+- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight padding:(float)padding {
     self = [super init];
     if (self) {
         _startY = startY;
@@ -35,6 +35,7 @@
         _images = images;
         _sectionWidth = sectionWidth;
         _sectionHeight = sectionHeight;
+        _padding = padding;
         [self prepareLayout];
     }
     return self;
@@ -93,6 +94,7 @@
 
 - (void)setInitialValues {
     self.idealHeight = self.sectionHeight / 1.1;
+
     self.resizedImages = [[NSMutableArray alloc] init];
     self.imageWidths = [[NSMutableArray alloc] init];
     self.numberOfRows = [self perfectRowNumber];
@@ -106,7 +108,7 @@
 
 - (void)resizeImagesToIdealHeight {
     for (UIImage *image in self.images) {
-        UIImage *img = [self scaledToHeight:self.idealHeight image:image];
+        UIImage *img = [self scaledToHeight:self.idealHeight image:[self addPaddingAroundImage:image padding:self.padding]];
         [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
         [self.resizedImages addObject:img];
     }
@@ -122,15 +124,14 @@
         NSMutableArray *workingArray = array;
         //check width
         CGFloat width = [self getSumOfWidthsFromArray:workingArray];
-        // if (width > self.sectionWidth) {
+
         NSMutableArray *resizedArray = [[NSMutableArray alloc] init];
         float precentage = (100 * self.sectionWidth) / width;
         for (UIImage *img in workingArray) {
-            UIImage *newImage = [self resizedImageWithPercent:precentage - 0.5 image:img];
+            UIImage *newImage = [self resizedImageWithPercent:precentage image:img];
             [resizedArray addObject:newImage];
         }
         workingArray = resizedArray;
-        // }
 
         for (UIImage *img in workingArray) {
             ImageAttribute *ia = [[ImageAttribute alloc] init];
@@ -156,6 +157,7 @@
 
     // NSArray *array = [self linearPartition];
     [self implementGreedySolution];
+    [self setImageAttributes];
 }
 
 - (UIImage *)scaledToWidth:(float)scaledToWidth image:(UIImage *)image {
@@ -296,7 +298,7 @@
 
     NSArray *tables = [self linearPartitionTable:k seq:seq];
 
-    NSMutableArray *table = [tables objectAtIndex:0];
+    //NSMutableArray *table = [tables objectAtIndex:0];
     NSMutableArray *solution = [tables objectAtIndex:1];
     k = k - 2;
     NSMutableArray *ans = [[NSMutableArray alloc] init];
@@ -527,6 +529,27 @@
     }
 
     return width;
+}
+
+- (UIImage *)addPaddingAroundImage:(UIImage *)image padding:(float)padding {
+    // Setup a new context with the correct size
+    CGFloat width = image.size.width + (self.padding * 4);
+    CGFloat height = image.size.height + (self.padding * 4);
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(width, height), NO, 0.0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    UIGraphicsPushContext(context);
+
+    // Now we can draw anything we want into this new context.
+    CGPoint origin = CGPointMake((width - image.size.width) / 2.0f,
+                                 (height - image.size.height) / 2.0f);
+    [image drawAtPoint:origin];
+
+    // Clean up and get the new image.
+    UIGraphicsPopContext();
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return newImage;
 }
 
 @end
