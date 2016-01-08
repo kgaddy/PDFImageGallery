@@ -6,9 +6,9 @@
 //  Copyright © 2015 Robert Gaddy LLC. All rights reserved.
 //
 
-#import "ImageAttribute.h"
+#import "PDFImageAttribute.h"
 #import "PDFImageSection.h"
-#import "PDFRowAttributes.h"
+//#import "PDFRowAttributes.h"
 
 @interface PDFImageSection ()
 @property (assign, nonatomic) NSUInteger shortestColumnIndex;
@@ -82,7 +82,7 @@
         workingArray = resizedArray;
 
         for (UIImage *img in workingArray) {
-            ImageAttribute *ia = [[ImageAttribute alloc] init];
+            PDFImageAttribute *ia = [[PDFImageAttribute alloc] init];
             ia.image = img;
 
             CGRect frame = CGRectMake(rowWidth, startY, img.size.width, img.size.height);

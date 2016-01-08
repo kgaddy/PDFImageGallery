@@ -6,7 +6,7 @@
 //  Copyright © 2015 Robert Gaddy LLC. All rights reserved.
 //
 
-#import "ImageAttribute.h"
+#import "PDFImageAttribute.h"
 #import "PDFImageSection.h"
 #import "ViewController.h"
 @interface ViewController ()
@@ -73,7 +73,7 @@
 
     PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height padding:4];
 
-    for (ImageAttribute *ia in pdfSection.imageAttributes) {
+    for (PDFImageAttribute *ia in pdfSection.imageAttributes) {
         [self addImage:ia.image atPoint:CGPointMake(ia.frame.origin.x, ia.frame.origin.y)];
     }
 

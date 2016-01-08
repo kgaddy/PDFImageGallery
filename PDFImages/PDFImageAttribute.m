@@ -6,8 +6,8 @@
 //  Copyright © 2015 Robert Gaddy LLC. All rights reserved.
 //
 
-#import "ImageAttribute.h"
+#import "PDFImageAttribute.h"
 
-@implementation ImageAttribute
+@implementation PDFImageAttribute
 
 @end
