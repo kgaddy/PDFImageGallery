@@ -8,7 +8,6 @@
 
 #import "PDFImageAttribute.h"
 #import "PDFImageSection.h"
-//#import "PDFRowAttributes.h"
 
 @interface PDFImageSection ()
 @property (assign, nonatomic) NSUInteger shortestColumnIndex;
@@ -40,70 +39,10 @@
     return self;
 }
 
-- (void)setInitialValues {
-    self.idealHeight = self.sectionHeight / 1.1;
-
-    self.resizedImages = [[NSMutableArray alloc] init];
-    self.imageWidths = [[NSMutableArray alloc] init];
-    self.numberOfRows = [self perfectRowNumber];
-}
-
-- (void)resizeIdealHeightToFitSectionHeight {
-    if (self.numberOfRows * self.idealHeight > self.sectionHeight) {
-        self.idealHeight = self.sectionHeight / self.numberOfRows;
-    }
-}
-
-- (void)resizeImagesToIdealHeight {
-    for (UIImage *image in self.images) {
-        UIImage *img = [self scaledToHeight:self.idealHeight image:[self addPaddingAroundImage:image padding:self.padding]];
-        [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
-        [self.resizedImages addObject:img];
-    }
-}
-
-- (void)setImageAttributes {
-    self.imageAttributes = [[NSMutableArray alloc] init];
-    int rowNumber = 0;
-    CGFloat rowWidth = self.startX;
-    CGFloat height = self.idealHeight;
-    CGFloat startY = 0.0;
-    for (NSMutableArray *array in self.resizedImages) {
-        NSMutableArray *workingArray = array;
-        //check width
-        CGFloat width = [self getSumOfWidthsFromArray:workingArray];
-
-        NSMutableArray *resizedArray = [[NSMutableArray alloc] init];
-        float precentage = (100 * self.sectionWidth) / width;
-        for (UIImage *img in workingArray) {
-            UIImage *newImage = [self resizedImageWithPercent:precentage image:img];
-            [resizedArray addObject:newImage];
-        }
-        workingArray = resizedArray;
-
-        for (UIImage *img in workingArray) {
-            PDFImageAttribute *ia = [[PDFImageAttribute alloc] init];
-            ia.image = img;
-
-            CGRect frame = CGRectMake(rowWidth, startY, img.size.width, img.size.height);
-            height = img.size.height;
-            ia.frame = frame;
-            [self.imageAttributes addObject:ia];
-            rowWidth = rowWidth + img.size.width;
-        }
-        startY = startY + height;
-        rowWidth = self.startX;
-
-        rowNumber++;
-    }
-}
-
 - (void)prepareLayout {
     [self setInitialValues];
     [self resizeIdealHeightToFitSectionHeight];
     [self resizeImagesToIdealHeight];
-
-    // NSArray *array = [self linearPartition];
     [self implementGreedySolution];
     [self setImageAttributes];
 }
@@ -154,14 +93,13 @@
     return newImage;
 }
 
-- (int)perfectRowNumber {
-    self.idealHeight = self.sectionHeight / 2;
+- (int)perfectRowNumberWidthHeight:(float)height sectionWidth:(float)sectionWidth images:(NSArray *)images {
     float totalWidth = 0;
-    for (UIImage *image in self.images) {
-        UIImage *img = [self scaledToHeight:self.idealHeight image:image];
+    for (UIImage *image in images) {
+        UIImage *img = [self scaledToHeight:height image:image];
         totalWidth = totalWidth + img.size.width;
     }
-    int val = (self.sectionWidth + totalWidth - 1) / self.sectionWidth;
+    int val = (sectionWidth + totalWidth - 1) / sectionWidth;
     return val;
 }
 
@@ -273,6 +211,64 @@
     UIGraphicsEndImageContext();
 
     return newImage;
+}
+
+- (void)setInitialValues {
+    self.idealHeight = self.sectionHeight / 2;
+
+    self.resizedImages = [[NSMutableArray alloc] init];
+    self.imageWidths = [[NSMutableArray alloc] init];
+    self.numberOfRows = [self perfectRowNumberWidthHeight:self.idealHeight sectionWidth:self.sectionWidth images:[self.images copy]];
+}
+
+- (void)resizeIdealHeightToFitSectionHeight {
+    if (self.numberOfRows * self.idealHeight > self.sectionHeight) {
+        self.idealHeight = self.sectionHeight / self.numberOfRows;
+    }
+}
+
+- (void)resizeImagesToIdealHeight {
+    for (UIImage *image in self.images) {
+        UIImage *img = [self scaledToHeight:self.idealHeight image:[self addPaddingAroundImage:image padding:self.padding]];
+        [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
+        [self.resizedImages addObject:img];
+    }
+}
+
+- (void)setImageAttributes {
+    self.imageAttributes = [[NSMutableArray alloc] init];
+    int rowNumber = 0;
+    CGFloat rowWidth = self.startX;
+    CGFloat height = self.idealHeight;
+    CGFloat startY = 0.0;
+    for (NSMutableArray *array in self.resizedImages) {
+        NSMutableArray *workingArray = array;
+        //check width
+        CGFloat width = [self getSumOfWidthsFromArray:workingArray];
+
+        NSMutableArray *resizedArray = [[NSMutableArray alloc] init];
+        float precentage = (100 * self.sectionWidth) / width;
+        for (UIImage *img in workingArray) {
+            UIImage *newImage = [self resizedImageWithPercent:precentage image:img];
+            [resizedArray addObject:newImage];
+        }
+        workingArray = resizedArray;
+
+        for (UIImage *img in workingArray) {
+            PDFImageAttribute *ia = [[PDFImageAttribute alloc] init];
+            ia.image = img;
+
+            CGRect frame = CGRectMake(rowWidth, startY, img.size.width, img.size.height);
+            height = img.size.height;
+            ia.frame = frame;
+            [self.imageAttributes addObject:ia];
+            rowWidth = rowWidth + img.size.width;
+        }
+        startY = startY + height;
+        rowWidth = self.startX;
+
+        rowNumber++;
+    }
 }
 
 @end

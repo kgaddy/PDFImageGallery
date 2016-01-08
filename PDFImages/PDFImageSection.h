@@ -21,4 +21,6 @@
 @property (nonatomic, assign) float pageHeight;
 @property (strong, nonatomic) NSMutableArray *imageAttributes;
 - (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight padding:(float)padding;
+- (CGFloat)getSumOfWidthsFromArray:(NSArray *)array;
+- (int)perfectRowNumberWidthHeight:(float)height sectionWidth:(float)sectionWidth images:(NSArray *)images;
 @end
