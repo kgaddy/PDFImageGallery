@@ -69,7 +69,6 @@
 
     CGRect textRect = [self addText:@"Test" withFrame:CGRectMake(10, 20, 400, 100) fontSize:16];
     CGRect boundingRect = CGRectMake(10, textRect.origin.y + textRect.size.height + 20, kPageWidth - 20, 400);
-    [self addLineWithFrame:boundingRect withColor:[UIColor redColor]];
 
     PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height padding:4];
 

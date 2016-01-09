@@ -100,6 +100,9 @@
         totalWidth = totalWidth + img.size.width;
     }
     int val = (sectionWidth + totalWidth - 1) / sectionWidth;
+    if (val > images.count) {
+        val = (int)images.count;
+    }
     return val;
 }
 
@@ -215,7 +218,6 @@
 
 - (void)setInitialValues {
     self.idealHeight = self.sectionHeight / 2;
-
     self.resizedImages = [[NSMutableArray alloc] init];
     self.imageWidths = [[NSMutableArray alloc] init];
     self.numberOfRows = [self perfectRowNumberWidthHeight:self.idealHeight sectionWidth:self.sectionWidth images:[self.images copy]];
@@ -229,9 +231,11 @@
 
 - (void)resizeImagesToIdealHeight {
     for (UIImage *image in self.images) {
-        UIImage *img = [self scaledToHeight:self.idealHeight image:[self addPaddingAroundImage:image padding:self.padding]];
-        [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
-        [self.resizedImages addObject:img];
+        if (image.size.height != self.idealHeight) {
+            UIImage *img = [self scaledToHeight:self.idealHeight image:[self addPaddingAroundImage:image padding:self.padding]];
+            [self.imageWidths addObject:[NSNumber numberWithInt:(int)img.size.width]];
+            [self.resizedImages addObject:img];
+        }
     }
 }
 
