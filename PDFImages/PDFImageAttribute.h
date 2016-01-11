@@ -12,5 +12,5 @@
 @interface PDFImageAttribute : NSObject
 @property (assign, nonatomic) CGRect frame;
 @property (strong, nonatomic) UIImage *image;
-@property (assign, nonatomic) NSUInteger columnIndex;
+@property (assign, nonatomic) int rowIndex;
 @end

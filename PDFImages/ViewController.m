@@ -68,24 +68,36 @@
     [mImageArray addObject:imgSix];
 
     CGRect textRect = [self addText:@"Test" withFrame:CGRectMake(10, 20, 400, 100) fontSize:16];
-    CGRect boundingRect = CGRectMake(10, textRect.origin.y + textRect.size.height + 20, kPageWidth - 20, 400);
+    CGRect boundingRect = CGRectMake(10, textRect.origin.y + textRect.size.height + 20, kPageWidth - 20, 700);
 
-    PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height padding:4];
+    PDFImageSection *pdfSection = [[PDFImageSection alloc] initWithPhotoArray:[mImageArray copy] startY:boundingRect.origin.y startX:boundingRect.origin.x sectionWidth:boundingRect.size.width sectionHeight:boundingRect.size.height padding:4 resizeImageFitEven:NO];
 
-    for (PDFImageAttribute *ia in pdfSection.imageAttributes) {
-        [self addImage:ia.image atPoint:CGPointMake(ia.frame.origin.x, ia.frame.origin.y)];
+    CGFloat totalHeight = textRect.origin.y + textRect.size.height + 20;
+    //  for (PDFImageAttribute *ia in pdfSection.imageAttributesByRows) {
+    for (NSMutableArray *row in pdfSection.imageAttributesByRows){
+        
+
+
+        if (pdfSection.idealHeight + totalHeight >= kPageHeight) {
+
+            UIGraphicsBeginPDFPageWithInfo(CGRectMake(0, 0, self.pageSize.width, self.pageSize.height), nil);
+        }
+        for (PDFImageAttribute *ia in row) {
+            [self addImage:ia.image atPoint:CGPointMake(ia.frame.origin.x, ia.frame.origin.y)];
+        }
+        totalHeight = totalHeight + pdfSection.idealHeight;
     }
 
-    [self addText:@"Test" withFrame:CGRectMake(10, 20, 400, 100) fontSize:16];
-    UIGraphicsEndPDFContext();
+[self addText:@"Test" withFrame:CGRectMake(10, 20, 400, 100) fontSize:16];
+UIGraphicsEndPDFContext();
 
-    NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+NSArray *docPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 
-    //Define new path for database in the documents directory because data cannot be written in the resource folder.
-    NSString *pdfDocPath = [[docPath objectAtIndex:0] stringByAppendingPathComponent:@"test.pdf"];
-    NSURL *pdfURL = [[NSURL alloc] initFileURLWithPath:pdfDocPath];
-    NSURLRequest *pdfReq = [[NSURLRequest alloc] initWithURL:pdfURL];
-    [self.pdfViewer loadRequest:pdfReq];
+//Define new path for database in the documents directory because data cannot be written in the resource folder.
+NSString *pdfDocPath = [[docPath objectAtIndex:0] stringByAppendingPathComponent:@"test.pdf"];
+NSURL *pdfURL = [[NSURL alloc] initFileURLWithPath:pdfDocPath];
+NSURLRequest *pdfReq = [[NSURLRequest alloc] initWithURL:pdfURL];
+[self.pdfViewer loadRequest:pdfReq];
 }
 
 - (CGRect)addImage:(UIImage *)image atPoint:(CGPoint)point {

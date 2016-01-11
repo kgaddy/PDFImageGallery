@@ -10,17 +10,20 @@
 #import <UIKit/UIKit.h>
 
 @interface PDFImageSection : NSObject
+@property (assign, nonatomic) float idealHeight;
 @property (strong, nonatomic) NSArray *images;
 @property (readonly, nonatomic) float padding;
 @property (readonly, nonatomic) float sectionHeight;
 @property (assign, nonatomic) float sectionWidth;
 @property (assign, nonatomic) float startY;
 @property (assign, nonatomic) float startX;
-@property (strong, nonatomic) NSMutableArray *columnsAttributes;
-@property (strong, nonatomic) NSMutableArray *rowAttributes;
 @property (nonatomic, assign) float pageHeight;
+@property (assign, nonatomic) NSUInteger numberOfRows;
 @property (strong, nonatomic) NSMutableArray *imageAttributes;
-- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight padding:(float)padding;
+@property (strong, nonatomic) NSMutableArray *imageAttributesByRows;
+@property (assign, nonatomic) float renderedSectionHeight;
+@property (assign, nonatomic) BOOL resizeImageFitEven;
+- (id)initWithPhotoArray:(NSArray *)images startY:(float)startY startX:(float)startX sectionWidth:(float)sectionWidth sectionHeight:(float)sectionHeight padding:(float)padding resizeImageFitEven:(BOOL)resizeImageFitEven;
 - (CGFloat)getSumOfWidthsFromArray:(NSArray *)array;
 - (int)perfectRowNumberWidthHeight:(float)height sectionWidth:(float)sectionWidth images:(NSArray *)images;
 @end
